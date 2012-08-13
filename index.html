@@ -4,8 +4,16 @@
 </head>
 <body>
     <div id="map3d" style="height: 400px; width: 600px;"></div>
+    <div>
+        <label>
+            KML URL: <input type="text" id="kmlurl" />
+        </label>
+        <button id="kmlload">Load</button>
+    </div>
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript">
+        var ge;
+
         function init()
         {
             google.earth.createInstance('map3d', initCB, failureCB);
@@ -22,8 +30,25 @@
             console.log(arguments);
         }
 
+        function addKML(url)
+        {
+            var link = ge.createLink('');
+            link.setHref(url);
+
+            var networkLink = ge.createNetworkLink('');
+            networkLink.setLink(link);
+            networkLink.setFlyToView(true);
+
+            ge.getFeatures().appendChild(networkLink);
+        }
+
         google.setOnLoadCallback(init);
         google.load('earth', '1');
+
+        document.getElementById('kmlload').onclick = function(e)
+        {
+            addKML(document.getElementById('kmlurl').value);
+        }
     </script>
 </body>
 </html>
