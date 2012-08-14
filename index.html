@@ -4,19 +4,47 @@
 </head>
 <body>
     <div id="map3d" style="height: 400px; width: 600px;"></div>
-    <div>
-        <label>
-            KML URL: <input type="text" id="kmlurl" />
-        </label>
-        <button id="kmlload">Load</button>
+    <div id="controls">
+        <div class="control">
+            <label>
+                KML URL: <input type="text" id="kmlurl" />
+            </label>
+            <button>Load</button>
+            <button>Remove</button>
+        </div>
     </div>
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript">
+        var kmls = [ ];
         var ge;
 
         function init()
         {
             google.earth.createInstance('map3d', initCB, failureCB);
+
+            // create dups of the control
+            var control = $('.control');
+
+            for (var i = 0; i < 5; i++)
+            {
+                kmls.push(null);
+
+                $('#controls').append(control.clone());
+            }
+
+            $('#controls .control button:first').click(function(e)
+            {
+                var parent = $(this).parent();
+
+                addKML(parent.find('input').val(), parent.index());
+            });
+
+            $('#controls .control button:last-child').click(function(e)
+            {
+                var parent = $(this).parent();
+
+                removeKML(parent.index());
+            });
         }
 
         function initCB(instance)
@@ -30,7 +58,7 @@
             console.log(arguments);
         }
 
-        function addKML(url)
+        function addKML(url, index)
         {
             var link = ge.createLink('');
             link.setHref(url);
@@ -40,15 +68,20 @@
             networkLink.setFlyToView(true);
 
             ge.getFeatures().appendChild(networkLink);
+
+            kmls[index] = networkLink;
+        }
+
+        function removeKML(index)
+        {
+            var item = ge.getFeatures().getChildNodes().item(index);
+
+            ge.getFeatures().removeChild(item);
         }
 
         google.setOnLoadCallback(init);
         google.load('earth', '1');
-
-        document.getElementById('kmlload').onclick = function(e)
-        {
-            addKML(document.getElementById('kmlurl').value);
-        }
+        google.load('jquery', '1');
     </script>
 </body>
 </html>
